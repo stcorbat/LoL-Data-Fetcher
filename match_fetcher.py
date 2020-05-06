@@ -3,7 +3,7 @@ import time
 from riotwatcher import ApiError
 
 
-def collect_match_data(region, summoner_name, game_id, lol_watcher):
+def collect_match_data(region, account_id, game_id, lol_watcher):
     response = get_match_json(region, game_id, lol_watcher)
 
     # dictionary to hold all the data values of interest from the MatchDto
@@ -12,7 +12,7 @@ def collect_match_data(region, summoner_name, game_id, lol_watcher):
     data.update({'duration': response['gameDuration']})
 
     # rest of the stats are found in the participants section
-    participant_id = get_participant_id(response, summoner_name)
+    participant_id = get_participant_id(response, account_id)
     # this shouldn't ever run but a -1 represents that the summoner was not in the match
     if participant_id == -1:
         print(game_id)
@@ -42,10 +42,10 @@ def collect_match_data(region, summoner_name, game_id, lol_watcher):
 
 
 # parses the participant ID based on the given summoner name
-def get_participant_id(match_json, summoner_name):
+def get_participant_id(match_json, account_id):
     participants = match_json['participantIdentities']
     for summoner in participants:
-        if summoner['player']['summonerName'] == summoner_name.lower():
+        if summoner['player']['accountId'] == account_id:
             return summoner['participantId']
 
     return -1
@@ -59,7 +59,7 @@ def get_match_json(region, game_id, lol_watcher):
             print('We should retry in {} seconds.'.format(err.headers['Retry-After']))
         elif err.response.status_code == 404:
             print('Match not found for game ID: {}'.format(game_id))
-        elif err.response.status_code == 504:
+        elif err.response.status_code == 504 or err.response.status_code == 503:
             # 504 happens randomly, wait a couple seconds then try again
             time.sleep(2)
             return get_match_json(region, game_id, lol_watcher)

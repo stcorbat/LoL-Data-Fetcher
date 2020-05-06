@@ -66,7 +66,7 @@ def get_all_summoner_matches(region, account_id, lol_watcher):
 def commit_new_games(db, vals, summoner_name):
     cursor = db.cursor(buffered=True)
     sql_format = "INSERT INTO SummonerMatches VALUES (" \
-                 "%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s" \
+                 "%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s" \
                  ")"
 
     cursor.executemany(sql_format, vals)
@@ -111,8 +111,8 @@ def update_games(summoner_json, lol_watcher, db):
         queue = match['queue']
         season = match['season']
 
-        progress_bar(index, len(matchlist) - 1)
-        match_data = match_fetcher.collect_match_data(region, name, game_id, lol_watcher)
+        progress_bar(index + 1, len(matchlist))
+        match_data = match_fetcher.collect_match_data(region, account_id, game_id, lol_watcher)
         if match_data is None:
             print("Invalid match data!")
             return
