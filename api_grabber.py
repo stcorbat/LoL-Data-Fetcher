@@ -117,6 +117,9 @@ def update_games(summoner_json, lol_watcher, db):
             print("Invalid match data!")
             return
 
+        if match_data['duration'] <= 300:
+            continue
+
         vals.append((
             account_id, game_id, timestamp, queue, season, match_data['duration'], match_data['win'],
             match_data['champion'], match_data['kills'], match_data['deaths'], match_data['assists'],
